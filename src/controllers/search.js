@@ -25,6 +25,15 @@ var express           = require('express'),
 //     })
 //   });
 
+
+// Actually All Searches in JSON
+  SearchController.route('/getActuallyAll')
+  .get(function(req, res, next) {
+    Posting.find(function(err, postings) {
+      res.json(postings);
+    });
+  });
+
 // Searches by User Id in JSON
 SearchController.route('/getAll')
   .get(function(req, res, next) {
