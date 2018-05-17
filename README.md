@@ -8,7 +8,8 @@ we are using node.js to make an express app.
 
 ## Wireframes & User Stories
 here are some mockups of what it might look like in the future
-![wireframe](http://i.imgur.com/bmrh1Hm.png "original wireframe")
+![home](https://github.com/bbaustin/crypt/blob/master/pic-home.png "home")
+![logged in](https://github.com/bbaustin/crypt/blob/master/pic-loggedin.png "logged in")
 
 ## Problems
 quite busy at gaba, so forward progress is slow. haha.
