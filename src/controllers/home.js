@@ -80,7 +80,17 @@ HomeController.route('/signup/?')
 // HOME PAGE -> LOGIN
 HomeController.route('/?') 
   .get(function(req, res, next) {
-    res.render('home')
+    if (req.session.isLoggedIn) {
+      Boss.findById(req.session.userId, function(err, boss) {
+        res.render('search', {
+          username: boss.username
+        });
+      });
+      console.log('something!!!!!!');
+    }
+    else {
+      res.render('home');
+    }
   })
    .post(function(req, res, next) {
     // Find user by username

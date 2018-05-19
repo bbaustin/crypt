@@ -5,6 +5,7 @@ var express           = require('express'),
     Search            = require(__dirname + '/../models/search'),
     Employee          = require(__dirname + '/../models/employee'),
     Posting           = require(__dirname + '/../models/posting'), 
+    Message           = require(__dirname + '/../models/message'),
     Boss              = require(__dirname + '/../models/boss');
 
 
@@ -42,6 +43,36 @@ SearchController.route('/getAll')
     });
   });
 
+  // Searches by User Id in JSON
+SearchController.route('/getMessages')
+  .get(function(req, res, next) {
+    Message.find({userId: req.session.userId}, function(err, messages) {
+      res.json(messages);
+    });
+  });
+
+
+// 5-19/20. not exactly working. keep working on messages between users
+SearchController.route('/makeMessage')
+  .get(function(req, res, next) {
+    res.render('makeMessage');
+  })
+  .post(function(req, res, next) {
+    Boss.findById(req.session.userId, function(err, boss) {
+      Message.create({
+        username: boss.username,
+        recipient: req.body.recipient,
+        content: req.body.content,
+        time: {type: Date, default: Date.now}
+      })
+
+      res.render('makePosting', {
+        username: boss.username
+      })
+    })
+  });
+
+
 // Search Page
 SearchController.route('/?') 
   .get(function(req, res) {
@@ -51,7 +82,6 @@ SearchController.route('/?')
     }
     else {
       Boss.findById(req.session.userId, function(err, boss) {
-        // console.log(boss, 'this is bossfind function');
         res.render('search', {
           username: boss.username
         });
@@ -60,8 +90,6 @@ SearchController.route('/?')
   })
   //make post
   .post(function(req, res, next) {
-    console.log('posting...');
-    console.log('hey ' + req.session.username);
     Posting.create({
       userId: req.session.userId,
       titleName: req.body.titleName,
@@ -75,12 +103,7 @@ SearchController.route('/?')
       }
       else {
         Boss.findById(req.session.userId, function(err, boss) {
-          console.log('line 91'); 
           Posting.find(function(err, posting) {
-            //LEFT OFF HERE. posting.userId coming back as undefined 
-            console.log(posting.userId);
-            console.log(req.session.userId);
-            console.log(posting.titleName);
             if (posting.userId === req.session.userId) {
               console.log('does thsi ever get hit?')
               res.render({titleName: posting.titleName})
@@ -90,7 +113,6 @@ SearchController.route('/?')
               titleName: posting.titleName,
               author: posting.author
             })
-            // console.log(posting + ": postings???");
           });
         });
       }
@@ -106,14 +128,6 @@ SearchController.route('/?')
   //     found: false
   //   });
   // });
-
-
-
-  ///HEY BEN, this is where you left off buddy. So you have some goals now.
-  // You wanna make a post, first of all. Shouldn't be too hard. 
-  // You want to make sure that post is being saved to your database. 
-  // The hard thing here, I think, is attributing a post to a user. I think you can do it using the backend tools like cookies and userid
-  
 
   
 
