@@ -48,6 +48,7 @@ SearchController.route('/getMessages')
   .get(function(req, res, next) {
     Message.find({userId: req.session.userId}, function(err, messages) {
       res.json(messages);
+      console.log(messages);
     });
   });
 
@@ -56,20 +57,42 @@ SearchController.route('/getMessages')
 SearchController.route('/makeMessage')
   .get(function(req, res, next) {
     res.render('makeMessage');
+
   })
   .post(function(req, res, next) {
-    Boss.findById(req.session.userId, function(err, boss) {
+     console.log('whats happening');
+    // Boss.findById(req.session.userId, function(err, boss) {
       Message.create({
-        username: boss.username,
+        username: 'dummy',
         recipient: req.body.recipient,
-        content: req.body.content,
-        time: {type: Date, default: Date.now}
-      })
+        messageContent: req.body.messageContent,
+      }, 
+      function(err, message, boss) {
+      if (err) {
+        console.log('73' + err);
+        res.render('search');
+      }
+      else {
+        //REALLY sloppy but working
+        Boss.findById(req.session.userId, function(err, boss) {
+          Message.find(function(err, message) {
+            console.log(message);
+            if (message.userId === req.session.userId) {
+              console.log('does thsi ever get asdfasdfasdfhit?')
+              res.render({titleName: message.titleName})
+            }       
+            res.render('makePosting', {
+              username: boss.username,
+              titleName: message.titleName,
+              author: message.author
+            })
+          });
+        });
+      }
+      // res.redirect('/search/getMessages')
+    // })
+  })
 
-      res.render('makePosting', {
-        username: boss.username
-      })
-    })
   });
 
 
