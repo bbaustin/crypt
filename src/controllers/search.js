@@ -46,9 +46,25 @@ SearchController.route('/getAll')
   // Searches by User Id in JSON
 SearchController.route('/getMessages')
   .get(function(req, res, next) {
-    Message.find({userId: req.session.userId}, function(err, messages) {
-      res.json(messages);
-      console.log(messages);
+    Boss.find({userId: req.session.userId}, function(err, boss) {
+      console.log("BOSS FIND: " + boss);
+      console.log("req.session.userId: " + req.session.userId);
+      console.log("req.session.username: " + req.session.username);
+      console.log("boss._id: " + boss._id);
+      Message.find(function(err, messages) {
+        console.log("MESSAGES!: " + messages);
+        console.log("messages.recipient: " + messages.recipient);
+        console.log("BOSSES!: " + boss);
+        if (err) {
+          console.log(err);
+          res.render('search');
+        }
+        else if (messages.recipient === boss.username) {
+          Message.find({recipient: req.session.username}, function (err, messages) {
+            res.json(messages);
+          }) 
+        }
+      });
     });
   });
 
@@ -60,12 +76,12 @@ SearchController.route('/makeMessage')
 
   })
   .post(function(req, res, next) {
-     console.log('whats happening');
-    // Boss.findById(req.session.userId, function(err, boss) {
+    console.log('whats happening');
+    Boss.findById(req.session.userId, function(err, boss) {
       Message.create({
-        username: 'dummy',
+        username: boss.username,
         recipient: req.body.recipient,
-        messageContent: req.body.messageContent,
+        messageContent: req.body.messageContent
       }, 
       function(err, message, boss) {
       if (err) {
@@ -73,7 +89,6 @@ SearchController.route('/makeMessage')
         res.render('search');
       }
       else {
-        //REALLY sloppy but working
         Boss.findById(req.session.userId, function(err, boss) {
           Message.find(function(err, message) {
             console.log(message);
@@ -89,10 +104,8 @@ SearchController.route('/makeMessage')
           });
         });
       }
-      // res.redirect('/search/getMessages')
-    // })
-  })
-
+      })
+    })
   });
 
 
