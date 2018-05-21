@@ -47,14 +47,7 @@ SearchController.route('/getAll')
 SearchController.route('/getMessages')
   .get(function(req, res, next) {
     Boss.find({userId: req.session.userId}, function(err, boss) {
-      console.log("BOSS FIND: " + boss);
-      console.log("req.session.userId: " + req.session.userId);
-      console.log("req.session.username: " + req.session.username);
-      console.log("boss._id: " + boss._id);
       Message.find(function(err, messages) {
-        console.log("MESSAGES!: " + messages);
-        console.log("messages.recipient: " + messages.recipient);
-        console.log("BOSSES!: " + boss);
         if (err) {
           console.log(err);
           res.render('search');
@@ -69,43 +62,51 @@ SearchController.route('/getMessages')
   });
 
 
-// 5-19/20. not exactly working. keep working on messages between users
 SearchController.route('/makeMessage')
   .get(function(req, res, next) {
     res.render('makeMessage');
-
   })
   .post(function(req, res, next) {
-    console.log('whats happening');
     Boss.findById(req.session.userId, function(err, boss) {
-      Message.create({
-        username: boss.username,
-        recipient: req.body.recipient,
-        messageContent: req.body.messageContent
-      }, 
-      function(err, message, boss) {
-      if (err) {
-        console.log('73' + err);
-        res.render('search');
-      }
-      else {
-        Boss.findById(req.session.userId, function(err, boss) {
-          Message.find(function(err, message) {
-            console.log(message);
-            if (message.userId === req.session.userId) {
-              console.log('does thsi ever get asdfasdfasdfhit?')
-              res.render({titleName: message.titleName})
-            }       
-            res.render('makePosting', {
-              username: boss.username,
-              titleName: message.titleName,
-              author: message.author
-            })
-          });
-        });
-      }
+      //checks to see if the recipient is an actual username. 
+      Boss.findOne({username: req.body.recipient}, function(err, boss) {
+        if (boss) {
+          console.log('boss.username: ' + boss.username);
+          console.log("BOSSFIND!!!!: " + Boss.find({username: req.body.recipient}));
+          Message.create({
+            username: boss.username,
+            recipient: req.body.recipient,
+            messageContent: req.body.messageContent
+          }, 
+          function(err, message, boss) {
+          if (err) {
+            console.log('err');
+            res.render('search');
+          }
+          else {
+            Boss.findById(req.session.userId, function(err, boss) {
+              Message.find(function(err, message) {
+                // console.log(message);
+                // if (message.userId === req.session.userId) {
+                //   console.log('does thsi ever get asdfasdfasdfhit?')
+                //   res.render({titleName: message.titleName})
+                // }       
+                res.render('makePosting', {
+                  username: 'boogerman',
+                  titleName: message.titleName,
+                  author: message.author
+                })
+              });
+            });
+          }
+          })
+        }
+        else {
+          // add some front-end thing here
+          console.log('yo, that is not a real user');
+        }
       })
-    })
+    });
   });
 
 
