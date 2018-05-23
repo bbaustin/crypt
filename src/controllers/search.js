@@ -74,8 +74,8 @@ SearchController.route('/makeMessage')
           console.log('boss.username: ' + boss.username);
           console.log("BOSSFIND!!!!: " + Boss.find({username: req.body.recipient}));
           Message.create({
-            username: boss.username,
-            recipient: req.body.recipient,
+            username: req.session.username,
+            recipient: req.body.recipient,   ////// LEFT OFF HERE 5/23 afternoon. want to get this name to populate in the form on the makeMessage page. Working between this spot and the API. you're close
             messageContent: req.body.messageContent
           }, 
           function(err, message, boss) {
@@ -92,7 +92,7 @@ SearchController.route('/makeMessage')
                 //   res.render({titleName: message.titleName})
                 // }       
                 res.render('makePosting', {
-                  username: 'boogerman',
+                  username: req.session.username,
                   titleName: message.titleName,
                   author: message.author
                 })
@@ -108,6 +108,56 @@ SearchController.route('/makeMessage')
       })
     });
   });
+
+
+/////KEEP WORKING ON THIS STUFF! 
+// TRYING TO GET POSTS TO POPULATE PAGES 
+/* GET/search/:id */
+SearchController.route('/:id')
+  .get(function(req, res, next) {
+    Posting.findById(req.params.id, function (err, item) {
+      if (err) {
+        console.log(err);
+      }
+      else if (item) {
+        console.log('you made it bro');
+        console.log(req.params.id); //coming up as first entry in db
+        console.log(item);
+        res.render('posting', {
+          titleName: item.titleName,
+          postContent: item.postContent
+        });
+      }
+      else {
+        console.log('yo this page is fake');
+        console.log(item);
+      }
+    })
+  });
+  /* PUT/items/:id */
+  // .put(function(req, res, next) {
+  //   // console.log(req.body);
+  //   Posting.findByIdAndUpdate(req.params.id, req.body, function (err, item) {
+  //     if (err) console.log(err);
+  //     res.json(item);
+  //   });
+  // })
+  // /* PATCH/items/:id */
+  // .patch(function(req, res, next) {
+  //   // console.log(req.body);
+  //   Posting.findByIdAndUpdate(req.params.id, req.body, function (err, item) {
+  //     if (err) console.log(err);
+  //     res.json(item);
+  //   });
+  // })
+  // /* DELETE/items/:id */
+  // .delete(function(req, res, next) {
+  //   // console.log(req.body);
+  //   Posting.findByIdAndRemove(req.params.id, req.body, function (err, item) {
+  //     if (err) console.log(err);
+  //     res.json(item);
+  //   });
+  // });
 
 
 // Search Page
@@ -127,6 +177,8 @@ SearchController.route('/?')
   })
   //make post
   .post(function(req, res, next) {
+    var myURL = req.body.titleName;
+    console.log('asdfasfd' + myURL);
     Posting.create({
       userId: req.session.userId,
       titleName: req.body.titleName,
@@ -150,7 +202,10 @@ SearchController.route('/?')
               titleName: posting.titleName,
               author: posting.author
             })
+
+
           });
+
         });
       }
     });

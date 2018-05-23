@@ -1,9 +1,9 @@
 $(document).ready(function(){
-  $.ajax(ajax);
-  $.ajax(ajax2);
+  $.ajax(gettingPosts); //what is this again? lol. just YOUR posts? 
+  $.ajax(gettingAllPosts);
 });
 
-var ajax = {
+var gettingPosts = {
   url: '/search/getAll',
   type: 'get',
   dataType: 'json',
@@ -17,13 +17,13 @@ var ajax = {
   }
 }
 
-var ajax2 = {
+var gettingAllPosts = {
   url: '/search/getActuallyAll',
   type: 'get',
   dataType: 'json',
   success: function(postings) {
     for (var i = 0; i < postings.length; i++) {
-      $('#postbox').append('<li> (' + postings[i].time.slice(0, 10) + ") <strong>" + postings[i].titleName + '</strong> by ' + postings[i].author + '</li>');
+      $('#postbox').append('<li>(' + postings[i].time.slice(0, 10) + ') <strong><a href="/search/' + postings[i]._id + '">'  + postings[i].titleName + '</strong></a> by <a href="/search/makemessage">' + postings[i].author + '</a></li>');  // I wanna have the username get put in the recipient field, but it's not super important. 
       console.log(postings[i].author);
     }
   },
